@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> Isotope Directive</title>
+  
+  <script type='text/javascript' src='/js/lib/dummy.js'></script>
+  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+    
+    
+      <script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    
+  
+    
+    
+      <script type='text/javascript' src="http://cdn.jsdelivr.net/isotope/1.5.21/jquery.isotope.min.js"></script>
+    
+  
+    
+    
+      <script type='text/javascript' src="http://cdn.jsdelivr.net/angularjs/1.0.2/angular.min.js"></script>
+    
+  
+  <style type='text/css'>
+    body { padding: 8px 20%; }
+section {
+    margin: 0 auto; padding: 8px 0 0 8px; 
+    border: 1px solid #ddd; }
+section article { 
+    margin: 0 8px 8px 0; padding: 4px; 
+    border: 1px solid #ddd; }
+  </style>
+  
+</head>
+<body ng-app="isotopeApp">
+  
+<div ng-controller="ItemsCtrl">
+    <button ng-click="add()">add</button>
+<section id="container"  isotope>
+    
+    <article ng-repeat="item in items">
+        <h2 id="{{item.id}}">{{item.title}}</h2>
+    </article>
+</section>
+</div>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+$(function(){
+$("#container").isotope({ 
+                itemSelector: 'article',
+                layoutMode: 'fitRows',
+                getSortData : {
+                    title: function(e) {
+                        return e.find('h2').text();
+                    }
+                },
+                sortBy: 'title',
+                sortAscending: true
+            });
+})
+
+
+var isotopeApp = angular.module('isotopeApp', []);
+
+isotopeApp.directive('isotope', function ($timeout) {
+    return {
+        link: function (scope, element, attrs) {
+          scope.$on('postAdded', function(){
+            $timeout(function(){
+              element.isotope( 'reloadItems' ).isotope({ sortBy: 'original-order' });
+            })
+          })
+        }
+    };
+});
+
+function ItemsCtrl($scope) {
+    $scope.add=function(){
+       
+        $scope.items.push({id: 1, title: 'one'})
+
+            $scope.$emit('postAdded')
+    }
+    $scope.items = [
+        {id: 1, title: 'one'},
+        {id: 2, title: 'two'},
+        {id: 3, title: 'three'}
+    ];
+    
+    //later in code after adding to $scope.items i'll call $scope.broadcast("postAdded") to retrigger isotope arrangement.
+}
+//]]>  
+
+</script>
+
+
+</body>
+
+
+</html>
+
